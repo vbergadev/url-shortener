@@ -1,0 +1,33 @@
+# Dependências
+node_modules/
+.pnpm-store/
+
+# Build
+dist/
+build/
+*.tsbuildinfo
+
+# Segredos — NUNCA versionar (ver CLAUDE.md §4)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Banco local
+*.sqlite
+*.sqlite3
+*.db
+
+# Testes / cobertura
+coverage/
+.vitest/
+
+# Logs
+*.log
+npm-debug.log*
+
+# SO / editor
+.DS_Store
+.idea/
+.vscode/

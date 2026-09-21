@@ -24,47 +24,76 @@ Derivado de `_user_stories.md` (comportamento) e `_techspec.md` (componentes).
 
 | Source | Behavior | Unit | Integration | E2E |
 |---|---|---|---|---|
-| US-001 (AC-1,2,3) | Encurtar URL válida, sem dedupe, sem colisão persistida | UT-015, UT-016, UT-018, UT-019 | IT-007, IT-008, IT-034 | E2E-001 |
-| US-001.EC-1 | Query string + fragmento preservados | UT-010 | IT-033 | — |
-| US-001.EC-2 | URL extremamente longa aceita | — | IT-032 | — |
-| US-001.EC-3 | Body sem `url` → 400 | — | IT-009 | — |
-| US-001.EC-4 | Body não é JSON válido → 400 | — | IT-010 | — |
-| US-002 (AC-1,2) | `expiresAt` opcional, normalizado | UT-011, UT-012, UT-013, UT-016 | IT-012 | — |
-| US-002.EC-1 | `expiresAt` no passado aceito na criação | — | IT-014 | E2E-002 |
-| US-002.EC-2 | `expiresAt` malformado → 400 | UT-014 | IT-013 | — |
+| US-001 (AC-1,2,3) | Encurtar URL válida, sem dedupe, sem colisão persistida | UT-015, UT-016, UT-018, UT-019 | IT-007 | E2E-001 |
+| US-001.EC-1 | Query string + fragmento preservados | UT-010 | — | — |
+| US-001.EC-2 | URL extremamente longa aceita | — | — (trivial: sem limite de tamanho implementado) | — |
+| US-001.EC-3 | Body sem `url` → 400 | — | IT-008 | — |
+| US-001.EC-4 | Body não é JSON válido → 400 | — | — (parsing do Fastify, não é lógica nossa) | — |
+| US-002 (AC-1,2) | `expiresAt` opcional, normalizado | UT-011, UT-012, UT-013, UT-016 | IT-010 | — |
+| US-002.EC-1 | `expiresAt` no passado aceito na criação | — | — | E2E-002 |
+| US-002.EC-2 | `expiresAt` malformado → 400 | UT-014 | — | — |
 | US-002.EC-3 | `expiresAt` com timezone não-UTC normalizado | UT-013 | — | — |
-| US-003 (AC-1,2) | Rejeitar protocolo/URL inválida | UT-006, UT-007 | IT-011 | E2E-003 |
+| US-003 (AC-1,2) | Rejeitar protocolo/URL inválida | UT-006, UT-007 | IT-009 | — |
 | US-003.EC-1 | URL vazia → 400 | UT-008 | — | — |
 | US-003.EC-2 | URL sem protocolo → 400 | UT-009 | — | — |
 | US-003.EC-3 | Protocolo maiúsculo aceito | UT-005 | — | — |
-| US-004 (AC-1,2) | Redirect 301 + tracking de clique | UT-020, UT-024 | IT-015 | E2E-001, E2E-004 |
-| US-004.EC-1 | Sem `Referer` → `referrer: null` | UT-024 | IT-016 | — |
-| US-004.EC-2 | Sem `User-Agent` → `userAgent: null` | UT-024 | IT-016 | — |
-| US-004.EC-3 | Cliques concorrentes, sem perda | — | IT-030 | — |
-| US-004.EC-4 | 100 cliques, todos contabilizados | — | IT-031 | — |
-| US-005 (AC-1) | 404 para código inexistente, sem clique | UT-021 | IT-017 | E2E-005 |
-| US-005.EC-1 | Código com caracteres fora do alfabeto → 404 | — | IT-018 | — |
-| US-006 (AC-1,2) | 410 para expirado, sem contar clique | UT-022 | IT-019 | E2E-002 |
-| US-006.EC-1 | `expiresAt === now` → 410 (borda inclusiva) | UT-022 | IT-020 | — |
+| US-004 (AC-1,2) | Redirect 301 + tracking de clique | UT-020, UT-024 | IT-011 | E2E-001, E2E-003 |
+| US-004.EC-1 | Sem `Referer` → `referrer: null` | UT-024 | — | — |
+| US-004.EC-2 | Sem `User-Agent` → `userAgent: null` | UT-024 | — | — |
+| US-004.EC-3 | Cliques concorrentes, sem perda | — | IT-014 | — |
+| US-004.EC-4 | 100 cliques, todos contabilizados | — | — (coberto pela prova de concorrência em IT-014) | — |
+| US-005 (AC-1) | 404 para código inexistente, sem clique | UT-021 | IT-012 | — |
+| US-005.EC-1 | Código com caracteres fora do alfabeto → 404 | — | — | — |
+| US-006 (AC-1,2) | 410 para expirado, sem contar clique | UT-022 | IT-013 | E2E-002 |
+| US-006.EC-1 | `expiresAt === now` → 410 (borda inclusiva) | UT-022 | — | — |
 | US-006.EC-2 | Sem `expiresAt` nunca expira | UT-023 | — | — |
-| US-007 (AC-1,2,3) | Listagem ordenada com `clickCount` | UT-025 | IT-022 | E2E-001, E2E-003 |
-| US-007.EC-1 | Nenhum link → `[]` | UT-026 | IT-021 | — |
-| US-007.EC-2 | Link sem clique → `clickCount: 0` | UT-026 | IT-021 | — |
+| US-007 (AC-1,2,3) | Listagem ordenada com `clickCount` | UT-025 | IT-016 | E2E-001 |
+| US-007.EC-1 | Nenhum link → `[]` | UT-026 | IT-015 | — |
+| US-007.EC-2 | Link sem clique → `clickCount: 0` | UT-026 | IT-015 | — |
 | US-007.EC-3 | Volume alto de links, lista completa | — | — | — (sem paginação; ver Non-Goals) |
-| US-008 (AC-1,2,3) | Stats: total, 30 dias, top referrers | UT-027 | IT-024 | E2E-001 |
-| US-008.EC-1 | Sem clique: zerado/vazio | UT-029 | IT-025 | — |
-| US-008.EC-2 | Código inexistente → 404 | UT-028 | IT-023 | — |
-| US-008.EC-3 | Referrer nulo agrupado sob "direto" | UT-027 | IT-006, IT-024 | — |
+| US-008 (AC-1,2,3) | Stats: total, 30 dias, top referrers | UT-027 | IT-018 | E2E-001 |
+| US-008.EC-1 | Sem clique: zerado/vazio | UT-029 | IT-019 | — |
+| US-008.EC-2 | Código inexistente → 404 | UT-028 | IT-017 | — |
+| US-008.EC-3 | Referrer nulo agrupado sob "direto" | UT-027 | IT-006, IT-018 | — |
 | US-008.EC-4 | >30 dias de histórico: só últimos 30 no `clicksByDay` | UT-030 | IT-004, IT-005 | — |
-| US-009 (AC-1,2) | Página HTML de analytics | UT-031 | IT-026 | E2E-004 |
-| US-009.EC-1 | Código inexistente → página de erro | — | IT-027 | — |
-| US-009.EC-2 | Zero cliques → estado "0 cliques" | UT-032 | IT-028 | — |
-| US-009.EC-3 | Link expirado ainda acessível em analytics | — | IT-029 | — |
+| US-009 (AC-1,2) | Página HTML de analytics | UT-031 | IT-020 | E2E-003 |
+| US-009.EC-1 | Código inexistente → página de erro | — | IT-021 | — |
+| US-009.EC-2 | Zero cliques → estado "0 cliques" | UT-032 | — | — |
+| US-009.EC-3 | Link expirado ainda acessível em analytics | — | — | — |
 | `lib/clock` | `Clock` real/fixo | UT-001 | — | — |
 | `lib/code-generator` | Alfabeto e tamanho do código | UT-002, UT-003 | — | — |
 | `errors/app-errors` | `code`/`statusCode` corretos por classe | UT-033 | — | — |
 | `repositories/links-repository` | Persistência e unicidade | — | IT-001, IT-002 | — |
 | `repositories/clicks-repository` | Persistência e contagem | — | IT-003 | — |
+
+### Recalibração unit vs. integration (revisão pós-geração)
+
+A primeira versão deste contrato saiu com 33 unit / 34 integration / 5 E2E — uma
+proporção próxima de 1:1 que não reflete a forma real de um serviço fino como
+este. Revisado para **33 unit / 21 integration / 3 E2E**:
+
+- **Mantido em Integration só o que não tem substituto em unit**: as 6 queries
+  SQL (constraint `UNIQUE`, CTE dos 30 dias, `GROUP BY` de referrers) só podem
+  ser verificadas contra um banco real — não têm equivalente em unit; o teste de
+  concorrência (`IT-014`) idem, precisa de I/O real disparado em paralelo. O
+  resto de Integration por rota ficou reduzido a um caso feliz + os erros que
+  provam que o mapeamento de status HTTP está de fato ligado ao serviço (não a
+  reexercitar cada regra de validação já coberta em unit).
+- **Cortado por redundância direta com unit**: casos de borda que a suíte de
+  `services/*` já prova com fake repository (`referrer`/`user-agent` nulos,
+  `expiresAt === now`, retry de colisão, 100 vs. 10 cliques) não ganham uma
+  segunda prova idêntica atravessando HTTP + SQLite de verdade — o risco de
+  wiring já está coberto pelo caso feliz da mesma rota.
+- **Cortado por risco desprezível**: comportamento do parser de JSON do Fastify
+  e ausência de limite de tamanho de URL (nunca implementamos um limite, então
+  não há o que quebrar).
+- **E2E** reduzido de 5 para 3: mantidas as duas jornadas de negócio cruzadas
+  (criação→cliques→stats; expiração nunca conta) e a jornada de valor central do
+  produto (analytics reflete cliques reais); as outras duas apenas repetiam, em
+  sequência, um caso já coberto isoladamente em Integration.
+
+IDs de teste foram renumerados nesta revisão (nada os consumia ainda — nenhuma
+task nem código foi gerado a partir da versão anterior).
 
 ## Unit Tests
 
@@ -215,80 +244,54 @@ Derivado de `_user_stories.md` (comportamento) e `_techspec.md` (componentes).
 
 - **IT-007**: `app.inject({ method: 'POST', url: '/api/shorten', payload: { url: 'https://example.com' } })`
   — `201`, corpo contém `shortCode` casando `/^[A-Za-z0-9]{7}$/`, `originalUrl: 'https://example.com'`, `expiresAt: null`.
-- **IT-008**: duas chamadas com o mesmo `url` — ambas `201`, `shortCode` diferente
-  entre as duas respostas.
-- **IT-009**: payload `{}` (sem `url`) — `400`, `error.code: 'VALIDATION_ERROR'`.
-- **IT-010**: body bruto `'{ invalid json'` com `Content-Type: application/json` —
-  `400`.
-- **IT-011**: payload `{ url: 'ftp://example.com' }` — `400`,
+- **IT-008**: payload `{}` (sem `url`) — `400`, `error.code: 'VALIDATION_ERROR'`.
+- **IT-009**: payload `{ url: 'ftp://example.com' }` — `400`,
   `error.code: 'INVALID_URL'`.
-- **IT-012**: payload `{ url: 'https://example.com', expiresAt: '2026-12-31T00:00:00Z' }`
+- **IT-010**: payload `{ url: 'https://example.com', expiresAt: '2026-12-31T00:00:00Z' }`
   — `201`, `expiresAt: '2026-12-31T00:00:00.000Z'`.
-- **IT-013**: payload `{ url: 'https://example.com', expiresAt: 'not-a-date' }` —
-  `400`, `error.code: 'INVALID_EXPIRES_AT'`.
-- **IT-014**: payload com `expiresAt` no passado relativo ao clock fixo injetado —
-  `201` (aceito).
-- **IT-032**: payload com `url` de 5000 caracteres (`https://example.com/` +
-  query string longa) — `201`, `originalUrl` igual ao enviado, sem truncar.
-- **IT-033**: payload `{ url: 'https://example.com/p?a=1&b=2#frag' }` — `201`,
-  `originalUrl` idêntico byte a byte ao enviado.
-- **IT-034**: code generator fake configurado com fila `['DUPCODE', 'FRESH01']` e
-  um link `shortCode: 'DUPCODE'` pré-existente no banco — `POST /api/shorten` —
-  `201` com `shortCode: 'FRESH01'`.
 
 ### `routes/redirect.routes.ts` (TechSpec: `GET /:code`)
 
-- **IT-015**: link ativo criado via `POST /api/shorten`; `app.inject({ method: 'GET', url: '/<code>' })`
+- **IT-011**: link ativo criado via `POST /api/shorten`; `app.inject({ method: 'GET', url: '/<code>' })`
   — `301`, header `location` igual à `originalUrl`; `GET /api/stats/<code>` em
   seguida mostra `totalClicks: 1`.
-- **IT-016**: `GET /<code>` sem headers `referer`/`user-agent` — `301`; `GET /api/stats/<code>`
-  confirma o clique contabilizado (`totalClicks: 1`) e, via IT-006, referrer nulo
-  agrupado sob `'direto'`.
-- **IT-017**: `GET /codigoquenuncaexistiu` — `404`,
+- **IT-012**: `GET /codigoquenuncaexistiu` — `404`,
   `error.code: 'LINK_NOT_FOUND'`; `GET /api/stats/codigoquenuncaexistiu` continua
   `404` (nenhum link foi criado por engano).
-- **IT-018**: `GET /c%C3%B3d%20inv%C3%A1lido` (código com espaço/unicode) — `404`.
-- **IT-019**: link criado com `expiresAt` no passado (clock fixo injetado) —
+- **IT-013**: link criado com `expiresAt` no passado (clock fixo injetado) —
   `GET /<code>` — `410`, `error.code: 'LINK_EXPIRED'`; `GET /api/stats/<code>`
   mostra `totalClicks: 0`.
-- **IT-020**: link criado com `expiresAt` igual, ao milissegundo, ao instante que o
-  clock fixo retorna na chamada de redirect — `GET /<code>` — `410`.
-- **IT-030**: link ativo; disparar 10 `app.inject({ method: 'GET', url: '/<code>' })`
+- **IT-014**: link ativo; disparar 10 `app.inject({ method: 'GET', url: '/<code>' })`
   em paralelo via `Promise.all` — todas as 10 respostas são `301`; `GET /api/stats/<code>`
   mostra `totalClicks: 10` (sem perda por concorrência).
-- **IT-031**: link ativo; 100 chamadas sequenciais de `GET /<code>` — `GET /api/stats/<code>`
-  mostra `totalClicks: 100`.
 
 ### `routes/urls.routes.ts` (TechSpec: `GET /api/urls`)
 
-- **IT-021**: banco vazio — `GET /api/urls` — `200`, corpo `[]`.
-- **IT-022**: 3 links criados em sequência (clock avançando entre eles) e 2
+- **IT-015**: banco vazio — `GET /api/urls` — `200`, corpo `[]`. Link sem clique
+  algum criado em seguida — reaparece na lista com `clickCount: 0`.
+- **IT-016**: 3 links criados em sequência (clock avançando entre eles) e 2
   cliques no segundo link — `GET /api/urls` — `200`, array com 3 itens ordenados
   por `createdAt` decrescente, item do segundo link com `clickCount: 2`, demais
   com `clickCount: 0`.
 
 ### `routes/stats.routes.ts` (TechSpec: `GET /api/stats/:code`)
 
-- **IT-023**: `GET /api/stats/codigoinexistente` — `404`,
+- **IT-017**: `GET /api/stats/codigoinexistente` — `404`,
   `error.code: 'LINK_NOT_FOUND'`.
-- **IT-024**: link com cliques semeados em dias e referrers variados — `GET /api/stats/<code>`
+- **IT-018**: link com cliques semeados em dias e referrers variados — `GET /api/stats/<code>`
   — `200`, `totalClicks` igual à soma dos cliques semeados, `clicksByDay` com 30
   itens, `topReferrers` ordenado decrescente com `null` agrupado sob `'direto'`.
-- **IT-025**: link sem nenhum clique — `GET /api/stats/<code>` — `200`,
+- **IT-019**: link sem nenhum clique — `GET /api/stats/<code>` — `200`,
   `totalClicks: 0`, `clicksByDay` com os 30 itens em `count: 0`,
   `topReferrers: []`.
 
 ### `routes/analytics.routes.ts` (TechSpec: `GET /analytics/:code`)
 
-- **IT-026**: link com cliques — `GET /analytics/<code>` — `200`,
+- **IT-020**: link com cliques — `GET /analytics/<code>` — `200`,
   `content-type` contém `text/html`, corpo contém o valor de `totalClicks` e o
   nome de ao menos um referrer.
-- **IT-027**: `GET /analytics/codigoinexistente` — `404`, `content-type` contém
+- **IT-021**: `GET /analytics/codigoinexistente` — `404`, `content-type` contém
   `text/html` (página de erro, não JSON).
-- **IT-028**: link sem cliques — `GET /analytics/<code>` — `200`, corpo contém
-  indicação de zero cliques.
-- **IT-029**: link com `expiresAt` no passado — `GET /analytics/<code>` — `200`
-  (analytics continua acessível apesar da expiração).
 
 ## End-to-End Tests
 
@@ -305,19 +308,8 @@ Derivado de `_user_stories.md` (comportamento) e `_techspec.md` (componentes).
 - **E2E-002**: `POST /api/shorten` com `expiresAt` no passado → `GET /<code>`
   retorna `410` → `GET /api/stats/<code>` mostra `totalClicks: 0`.
 
-### URL inválida nunca gera link (US-001, US-003)
-
-- **E2E-003**: `POST /api/shorten` com `{ url: 'javascript:alert(1)' }` — `400`
-  → `GET /api/urls` retorna `[]` (nenhum link foi persistido pela tentativa
-  rejeitada).
-
 ### Página de analytics reflete os cliques reais (US-001, US-004, US-009)
 
-- **E2E-004**: `POST /api/shorten` cria um link → `GET /<code>` (com
+- **E2E-003**: `POST /api/shorten` cria um link → `GET /<code>` (com
   `Referer: https://google.com`) → `GET /analytics/<code>` — `200 text/html`
   contendo `totalClicks: 1` e `'https://google.com'` (ou seu rótulo agregado).
-
-### Visitante em código nunca criado (US-005)
-
-- **E2E-005**: `GET /codigoquenuncaexistiu` — `404` → `GET /api/urls` confirma
-  `[]` (nenhum efeito colateral da tentativa de acesso a código inexistente).
